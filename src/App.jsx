@@ -1,46 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 
-// Component Imports
-import AnnouncementBar from './components/AnnouncementBar';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Loader from './components/Loader';
-import QuickViewModal from './components/QuickViewModal';
+// Components
+import AnnouncementBar from "./components/AnnouncementBar";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Loader from "./components/Loader";
+import QuickViewModal from "./components/QuickViewModal";
 
-// Page Imports
-import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetails from './pages/ProductDetails';
-import About from './pages/About';
-import Contact from './pages/Contact';
+// Website Pages
+import Home from "./pages/Home";
+import Shop from "./pages/Shop";
+import ProductDetails from "./pages/ProductDetails";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 
-// Scroll To Top Restoration Utility
-const ScrollToTop = () => {
-  const { pathname, search } = useLocation();
+// Admin Pages
+import Login from "./admin/Login";
+import Dashboard from "./admin/Dashboard";
+import AddProduct from "./admin/AddProduct";
+import ProductList from "./admin/ProductList";
+import EditProduct from "./admin/EditProduct";
+import TestAppwrite from "./admin/TestAppwrite";
+import ProtectedRoute from "./admin/ProtectedRoute";
+
+// Scroll To Top
+function ScrollToTop() {
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    // If there is a hash (e.g. #shipping-policy), do not reset scroll to top immediately,
-    // let the About page handle scrolling to the specific anchor ID.
-    if (!window.location.hash) {
-      window.scrollTo(0, 0);
-    }
-  }, [pathname, search]);
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return null;
-};
+}
 
 function App() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
-  // Fade out loader on initial load after 2 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setInitialLoading(false);
     }, 2000);
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -51,50 +61,119 @@ function App() {
 
   const handleCloseQuickView = () => {
     setIsQuickViewOpen(false);
-    // Don't clear product instantly to allow exit animations to complete
+
     setTimeout(() => {
-      if (!isQuickViewOpen) setQuickViewProduct(null);
-    }, 4000);
+      setQuickViewProduct(null);
+    }, 400);
   };
 
   return (
     <Router>
       <ScrollToTop />
-      
-      {/* Entrance Animation Screen */}
+
       <AnimatePresence>
         {initialLoading && <Loader />}
       </AnimatePresence>
 
       <div className="flex flex-col min-h-screen bg-white text-luxury-dark selection:bg-luxury-dark selection:text-luxury-light">
-        {/* Announcement Header */}
+
         <AnnouncementBar />
 
-        {/* Global sticky navigation bar */}
         <Navbar />
 
-        {/* Page Content viewport */}
         <main className="flex-grow">
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<Home onQuickView={handleOpenQuickView} />} />
-              <Route path="/shop" element={<Shop onQuickView={handleOpenQuickView} />} />
-              <Route path="/product/:id" element={<ProductDetails onQuickView={handleOpenQuickView} />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
-          </AnimatePresence>
+          <Routes>
+
+            {/* Website */}
+
+            <Route
+              path="/"
+              element={<Home onQuickView={handleOpenQuickView} />}
+            />
+
+            <Route
+              path="/shop"
+              element={<Shop onQuickView={handleOpenQuickView} />}
+            />
+
+            <Route
+              path="/product/:id"
+              element={<ProductDetails onQuickView={handleOpenQuickView} />}
+            />
+
+            <Route path="/about" element={<About />} />
+
+            <Route path="/contact" element={<Contact />} />
+
+            {/* Login */}
+
+            <Route path="/login" element={<Login />} />
+
+            {/* Protected Admin Routes */}
+
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/add-product"
+              element={
+                <ProtectedRoute>
+                  <AddProduct />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/products"
+              element={
+                <ProtectedRoute>
+                  <ProductList />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditProduct />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Test */}
+
+            <Route
+              path="/test"
+              element={<TestAppwrite />}
+            />
+
+          </Routes>
         </main>
 
-        {/* Global Footer component */}
         <Footer />
 
-        {/* Reusable Quick View Modal Overlay */}
         <QuickViewModal
           product={quickViewProduct}
           isOpen={isQuickViewOpen}
           onClose={handleCloseQuickView}
         />
+
       </div>
     </Router>
   );

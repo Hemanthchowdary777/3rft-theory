@@ -1,13 +1,14 @@
 import React, { useRef } from 'react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
-import { products } from '../data/products';
 import ProductCard from './ProductCard';
+import { useProducts } from '../hooks/useProducts';
 
 const TrendingJerseys = ({ onQuickView }) => {
   const scrollContainerRef = useRef(null);
+  const { products, loading } = useProducts();
 
   // Filter for jerseys category
-  const jerseys = products.filter(p => p.category === 'Jerseys');
+  const jerseys = products.filter((p) => p.category === 'Jerseys');
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
@@ -53,19 +54,27 @@ const TrendingJerseys = ({ onQuickView }) => {
         </div>
 
         {/* Horizontal Slider Wrapper */}
-        <div
-          ref={scrollContainerRef}
-          className="flex overflow-x-auto no-scrollbar gap-6 pb-6 snap-x snap-mandatory scroll-smooth"
-        >
-          {jerseys.map((product) => (
-            <div
-              key={product.id}
-              className="flex-shrink-0 w-[280px] sm:w-[320px] snap-start"
-            >
-              <ProductCard product={product} onQuickView={onQuickView} />
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-[10px] tracking-widest uppercase text-luxury-darkGrey font-medium">
+              Loading collection...
+            </p>
+          </div>
+        ) : (
+          <div
+            ref={scrollContainerRef}
+            className="flex overflow-x-auto no-scrollbar gap-6 pb-6 snap-x snap-mandatory scroll-smooth"
+          >
+            {jerseys.map((product) => (
+              <div
+                key={product.id}
+                className="flex-shrink-0 w-[280px] sm:w-[320px] snap-start"
+              >
+                <ProductCard product={product} onQuickView={onQuickView} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

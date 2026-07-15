@@ -3,21 +3,30 @@ import { useParams, Link } from 'react-router-dom';
 import { FiInstagram, FiCornerUpLeft } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { products } from '../data/products';
 import ProductCard from '../components/ProductCard';
+import { useProductBySlug } from '../hooks/useProducts';
+import { PLACEHOLDER_IMAGE } from '../lib/imageUrl';
 
 const ProductDetails = ({ onQuickView }) => {
   const { id } = useParams();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  // Retrieve current product
-  const product = products.find((p) => p.id === id);
+  const { product, relatedProducts, loading } = useProductBySlug(id);
 
   // Scroll to top on mount or product change
   useEffect(() => {
     window.scrollTo(0, 0);
     setActiveImageIndex(0);
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="pt-40 pb-24 text-center px-6">
+        <p className="text-[10px] tracking-widest uppercase text-luxury-darkGrey font-medium">
+          Loading product...
+        </p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -36,12 +45,7 @@ const ProductDetails = ({ onQuickView }) => {
     );
   }
 
-  const { name, price, condition, sizes, description, images, category, soldOut, newArrival } = product;
-
-  // Filter related products
-  const relatedProducts = products
-    .filter((p) => p.category === category && p.id !== id)
-    .slice(0, 4);
+  const { name, price, condition, sizes, description, images, soldOut, newArrival } = product;
 
   // Construct URL-encoded pre-filled WhatsApp message
   const prefilledMessage = `Hi 3RFT THEORY,\n\nI'm interested in purchasing this product.\n\nProduct Name:\n${name}\n\nPrice:\n₹${price.toLocaleString('en-IN')}\n\nPlease let me know if it is available.`;
@@ -72,9 +76,12 @@ const ProductDetails = ({ onQuickView }) => {
             {/* Main Display image */}
             <div className="aspect-[3/4] w-full overflow-hidden bg-luxury-lightGrey border border-luxury-lightGrey">
               <img
-                src={images[activeImageIndex]}
+                src={images[activeImageIndex] || PLACEHOLDER_IMAGE}
                 alt={`${name} display`}
                 className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
+                onError={(event) => {
+                  event.currentTarget.src = PLACEHOLDER_IMAGE;
+                }}
               />
             </div>
 
@@ -89,7 +96,14 @@ const ProductDetails = ({ onQuickView }) => {
                       activeImageIndex === index ? 'border-luxury-dark' : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt={`${name} thumb ${index}`} className="w-full h-full object-cover" />
+                    <img
+                      src={img || PLACEHOLDER_IMAGE}
+                      alt={`${name} thumb ${index}`}
+                      className="w-full h-full object-cover"
+                      onError={(event) => {
+                        event.currentTarget.src = PLACEHOLDER_IMAGE;
+                      }}
+                    />
                   </button>
                 ))}
               </div>

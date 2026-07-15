@@ -1,11 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ProductGrid from './ProductGrid';
-import { products } from '../data/products';
+import { useFeaturedProducts } from '../hooks/useProducts';
 
 const FeaturedProducts = ({ onQuickView }) => {
-  // Filter for featured products
-  const featuredItems = products.filter(p => p.featured).slice(0, 4);
+  const { products: featuredItems, loading } = useFeaturedProducts(4);
 
   return (
     <section className="py-24 px-6 md:px-12 bg-luxury-light">
@@ -29,7 +28,15 @@ const FeaturedProducts = ({ onQuickView }) => {
         </div>
 
         {/* Featured Grid */}
-        <ProductGrid products={featuredItems} onQuickView={onQuickView} />
+        {loading ? (
+          <div className="text-center py-20">
+            <p className="text-[10px] tracking-widest uppercase text-luxury-darkGrey font-medium">
+              Loading collection...
+            </p>
+          </div>
+        ) : (
+          <ProductGrid products={featuredItems} onQuickView={onQuickView} />
+        )}
       </div>
     </section>
   );

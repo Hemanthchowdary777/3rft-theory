@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FiSliders, FiSearch, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { products } from '../data/products';
 import ProductGrid from '../components/ProductGrid';
+import { useProducts } from '../hooks/useProducts';
 
 const Shop = ({ onQuickView }) => {
+  const { products, loading } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -309,7 +310,15 @@ const Shop = ({ onQuickView }) => {
             </p>
 
             {/* Grid */}
-            <ProductGrid products={filteredProducts} onQuickView={onQuickView} />
+            {loading ? (
+              <div className="text-center py-20">
+                <p className="text-[10px] tracking-widest uppercase text-luxury-darkGrey font-medium">
+                  Loading collection...
+                </p>
+              </div>
+            ) : (
+              <ProductGrid products={filteredProducts} onQuickView={onQuickView} />
+            )}
           </main>
         </div>
       </div>

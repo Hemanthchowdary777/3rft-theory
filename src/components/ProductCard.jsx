@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PLACEHOLDER_IMAGE } from '../lib/imageUrl';
 
 const ProductCard = ({ product, onQuickView }) => {
   const { id, name, price, condition, sizes, images, newArrival, soldOut } = product;
@@ -18,10 +19,13 @@ const ProductCard = ({ product, onQuickView }) => {
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-luxury-lightGrey mb-4">
         <Link to={`/product/${id}`} className="block w-full h-full">
           <img
-            src={displayImage}
+            src={displayImage || PLACEHOLDER_IMAGE}
             alt={name}
             loading="lazy"
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            onError={(event) => {
+              event.currentTarget.src = PLACEHOLDER_IMAGE;
+            }}
           />
         </Link>
 
