@@ -3,6 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { FiInstagram, FiCornerUpLeft } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import ProductCard from '../components/ProductCard';
 import { useProductBySlug } from '../hooks/useProducts';
 import { PLACEHOLDER_IMAGE } from '../lib/imageUrl';
@@ -73,41 +79,27 @@ const ProductDetails = ({ onQuickView }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-24">
           {/* Column 1: Image Gallery (Span 7) */}
           <div className="lg:col-span-7 flex flex-col gap-4">
-            {/* Main Display image */}
-            <div className="aspect-[3/4] w-full overflow-hidden bg-luxury-lightGrey border border-luxury-lightGrey">
-              <img
-                src={images[activeImageIndex] || PLACEHOLDER_IMAGE}
-                alt={`${name} display`}
-                className="w-full h-full object-cover transition-all duration-700 hover:scale-105"
-                onError={(event) => {
-                  event.currentTarget.src = PLACEHOLDER_IMAGE;
-                }}
-              />
-            </div>
-
-            {/* Thumbnail Selection */}
-            {images.length > 1 && (
-              <div className="flex gap-3 mt-2">
-                {images.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setActiveImageIndex(index)}
-                    className={`relative w-20 aspect-[3/4] overflow-hidden bg-luxury-lightGrey border-2 transition-all ${
-                      activeImageIndex === index ? 'border-luxury-dark' : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img
-                      src={img || PLACEHOLDER_IMAGE}
-                      alt={`${name} thumb ${index}`}
-                      className="w-full h-full object-cover"
-                      onError={(event) => {
-                        event.currentTarget.src = PLACEHOLDER_IMAGE;
-                      }}
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
+          <Swiper
+  modules={[Navigation, Pagination]}
+  navigation
+  pagination={{ clickable: true }}
+  loop={images.length > 1}
+  spaceBetween={10}
+  className="aspect-[3/4] rounded-lg overflow-hidden"
+>
+  {images.map((img, index) => (
+    <SwiperSlide key={index}>
+      <img
+        src={img || PLACEHOLDER_IMAGE}
+        alt={`${name} ${index + 1}`}
+        className="w-full h-full object-cover"
+        onError={(event) => {
+          event.currentTarget.src = PLACEHOLDER_IMAGE;
+        }}
+      />
+    </SwiperSlide>
+  ))}
+</Swiper>
           </div>
 
           {/* Column 2: Sticky Info Panel (Span 5) */}
