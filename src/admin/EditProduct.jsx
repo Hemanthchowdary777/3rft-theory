@@ -9,6 +9,40 @@ function EditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const subcategories = {
+    Men: [
+      "Top Wear",
+      "Bottom Wear",
+      "Oversized Tees",
+      "Hoodies",
+      "Cargo Pants",
+      "Jeans",
+    ],
+
+    Women: [
+      "Top Wear",
+      "Bottom Wear",
+      "Cargo Pants",
+      "Jeans",
+      "Hoodies",
+    ],
+
+    Jerseys: [
+      "Football Jerseys",
+      "Basketball Jerseys",
+      "Cricket Jerseys",
+    ],
+
+    Accessories: [
+      "Caps",
+      "Bags",
+      "Belts",
+      "Chains",
+      "Watches",
+      "Wallets",
+    ],
+  };
+
   const [loading, setLoading] = useState(true);
 
   const [product, setProduct] = useState({
@@ -16,7 +50,7 @@ function EditProduct() {
     price: "",
     originalPrice: "",
     brand: "",
-    category: "men",
+    category: "Men",
     subcategory: "",
     description: "",
     stock: 1,
@@ -37,7 +71,7 @@ function EditProduct() {
           price: data.price || "",
           originalPrice: data.originalPrice || "",
           brand: data.brand || "",
-          category: data.category || "men",
+          category: data.category || "Men",
           subcategory: data.subcategory || "",
           description: data.description || "",
           stock: data.stock || 1,
@@ -61,6 +95,15 @@ function EditProduct() {
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
 
+    if (name === "category") {
+      setProduct((prev) => ({
+        ...prev,
+        category: value,
+        subcategory: "",
+      }));
+      return;
+    }
+
     setProduct((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -83,6 +126,7 @@ function EditProduct() {
       </div>
     );
   }
+
   const handleSubmit = async () => {
     try {
       await updateProduct(id, {
@@ -115,7 +159,9 @@ function EditProduct() {
         <div className="grid grid-cols-2 gap-6">
 
           <div>
-            <label className="font-semibold">Product Name</label>
+            <label className="font-semibold">
+              Product Name
+            </label>
 
             <input
               type="text"
@@ -127,7 +173,9 @@ function EditProduct() {
           </div>
 
           <div>
-            <label className="font-semibold">Brand</label>
+            <label className="font-semibold">
+              Brand
+            </label>
 
             <input
               type="text"
@@ -139,7 +187,9 @@ function EditProduct() {
           </div>
 
           <div>
-            <label className="font-semibold">Price</label>
+            <label className="font-semibold">
+              Price
+            </label>
 
             <input
               type="number"
@@ -151,7 +201,9 @@ function EditProduct() {
           </div>
 
           <div>
-            <label className="font-semibold">Original Price</label>
+            <label className="font-semibold">
+              Original Price
+            </label>
 
             <input
               type="number"
@@ -161,9 +213,10 @@ function EditProduct() {
               className="w-full border p-3 rounded mt-2"
             />
           </div>
-
           <div>
-            <label className="font-semibold">Category</label>
+            <label className="font-semibold">
+              Category
+            </label>
 
             <select
               name="category"
@@ -171,27 +224,38 @@ function EditProduct() {
               onChange={handleChange}
               className="w-full border p-3 rounded mt-2"
             >
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-              <option value="jerseys">Jerseys</option>
-              <option value="accessories">Accessories</option>
+              <option value="Men">Men</option>
+              <option value="Women">Women</option>
+              <option value="Jerseys">Jerseys</option>
+              <option value="Accessories">Accessories</option>
             </select>
           </div>
 
           <div>
-            <label className="font-semibold">Stock</label>
+            <label className="font-semibold">
+              Subcategory
+            </label>
 
-            <input
-              type="number"
-              name="stock"
-              value={product.stock}
+            <select
+              name="subcategory"
+              value={product.subcategory}
               onChange={handleChange}
               className="w-full border p-3 rounded mt-2"
-            />
+            >
+              <option value="">Select Subcategory</option>
+
+              {subcategories[product.category].map((sub) => (
+                <option key={sub} value={sub}>
+                  {sub}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="col-span-2">
-            <label className="font-semibold">Description</label>
+            <label className="font-semibold">
+              Description
+            </label>
 
             <textarea
               rows="4"
@@ -202,10 +266,45 @@ function EditProduct() {
             />
           </div>
 
+          <div>
+            <label className="font-semibold">
+              Stock
+            </label>
+
+            <input
+              type="number"
+              name="stock"
+              value={product.stock}
+              onChange={handleChange}
+              className="w-full border p-3 rounded mt-2"
+            />
+          </div>
+
+          <div>
+            <label className="font-semibold">
+              Condition
+            </label>
+
+            <select
+              name="condition"
+              value={product.condition}
+              onChange={handleChange}
+              className="w-full border p-3 rounded mt-2"
+            >
+              <option value="new">Brand New</option>
+              <option value="like-new">Like New</option>
+              <option value="vintage">Vintage</option>
+            </select>
+          </div>
+
           <div className="col-span-2">
-            <label className="font-semibold">Sizes</label>
+
+            <label className="font-semibold">
+              Sizes
+            </label>
 
             <div className="flex gap-3 mt-3">
+
               {["S", "M", "L", "XL"].map((size) => (
                 <button
                   key={size}
@@ -220,66 +319,76 @@ function EditProduct() {
                   {size}
                 </button>
               ))}
-            </div>
-          </div>
 
+            </div>
+
+          </div>
           <div className="col-span-2 flex gap-8">
 
-            <label>
-              <input
-                type="checkbox"
-                name="featured"
-                checked={product.featured}
-                onChange={handleChange}
-              />
-              <span className="ml-2">Featured</span>
-            </label>
+<label>
+  <input
+    type="checkbox"
+    name="featured"
+    checked={product.featured}
+    onChange={handleChange}
+  />
 
-            <label>
-              <input
-                type="checkbox"
-                name="newArrival"
-                checked={product.newArrival}
-                onChange={handleChange}
-              />
-              <span className="ml-2">New Arrival</span>
-            </label>
+  <span className="ml-2">
+    Featured
+  </span>
+</label>
 
-            <label>
-              <input
-                type="checkbox"
-                name="freeShipping"
-                checked={product.freeShipping}
-                onChange={handleChange}
-              />
-              <span className="ml-2">Free Shipping</span>
-            </label>
+<label>
+  <input
+    type="checkbox"
+    name="newArrival"
+    checked={product.newArrival}
+    onChange={handleChange}
+  />
 
-          </div>
+  <span className="ml-2">
+    New Arrival
+  </span>
+</label>
 
-          <div className="col-span-2 flex gap-4">
+<label>
+  <input
+    type="checkbox"
+    name="freeShipping"
+    checked={product.freeShipping}
+    onChange={handleChange}
+  />
 
-            <button
-              onClick={handleSubmit}
-              className="bg-black text-white px-8 py-3 rounded-lg"
-            >
-              Save Changes
-            </button>
+  <span className="ml-2">
+    Free Shipping
+  </span>
+</label>
 
-            <button
-              onClick={() => navigate("/admin/products")}
-              className="bg-gray-500 text-white px-8 py-3 rounded-lg"
-            >
-              Cancel
-            </button>
+</div>
 
-          </div>
+<div className="col-span-2 flex gap-4">
 
-        </div>
+<button
+  onClick={handleSubmit}
+  className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800"
+>
+  Save Changes
+</button>
 
-      </div>
-    </div>
-  );
+<button
+  onClick={() => navigate("/admin/products")}
+  className="bg-gray-500 text-white px-8 py-3 rounded-lg hover:bg-gray-600"
+>
+  Cancel
+</button>
+
+</div>
+
+</div>
+
+</div>
+</div>
+);
 }
 
 export default EditProduct;

@@ -2,12 +2,47 @@ import React, { useState } from "react";
 import { addProduct } from "../services/productService";
 
 function AddProduct() {
+
+  const subcategories = {
+    Men: [
+      "Top Wear",
+      "Bottom Wear",
+      "Oversized Tees",
+      "Hoodies",
+      "Cargo Pants",
+      "Jeans",
+    ],
+
+    Women: [
+      "Top Wear",
+      "Bottom Wear",
+      "Cargo Pants",
+      "Jeans",
+      "Hoodies",
+    ],
+
+    Jerseys: [
+      "Football Jerseys",
+      "Basketball Jerseys",
+      "Cricket Jerseys",
+    ],
+
+    Accessories: [
+      "Caps",
+      "Bags",
+      "Belts",
+      "Chains",
+      "Watches",
+      "Wallets",
+    ],
+  };
+
   const [product, setProduct] = useState({
     name: "",
     price: "",
     originalPrice: "",
     brand: "",
-    category: "men",
+    category: "Men",
     subcategory: "",
     description: "",
     stock: 1,
@@ -22,6 +57,15 @@ function AddProduct() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    if (name === "category") {
+      setProduct((prev) => ({
+        ...prev,
+        category: value,
+        subcategory: "",
+      }));
+      return;
+    }
 
     setProduct((prev) => ({
       ...prev,
@@ -41,19 +85,20 @@ function AddProduct() {
   const handleImageChange = (e) => {
     setImages(Array.from(e.target.files));
   };
+
   const handleSubmit = async () => {
     try {
-  
+
       if (!product.name) {
         alert("Enter product name");
         return;
       }
-  
+
       if (!product.price) {
         alert("Enter price");
         return;
       }
-  
+
       await addProduct(
         {
           ...product,
@@ -65,14 +110,15 @@ function AddProduct() {
         },
         images
       );
+
       alert("✅ Product Added!");
-  
+
       setProduct({
         name: "",
         price: "",
         originalPrice: "",
         brand: "",
-        category: "men",
+        category: "Men",
         subcategory: "",
         description: "",
         stock: 1,
@@ -82,9 +128,9 @@ function AddProduct() {
         freeShipping: true,
         sizes: [],
       });
-  
+
       setImages([]);
-  
+
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -168,25 +214,31 @@ function AddProduct() {
               onChange={handleChange}
               className="w-full border p-3 rounded mt-2"
             >
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-              <option value="jerseys">Jerseys</option>
-              <option value="accessories">Accessories</option>
+              <option value="Men">Men</option>
+              <option value="Women">Women</option>
+              <option value="Jerseys">Jerseys</option>
+              <option value="Accessories">Accessories</option>
             </select>
           </div>
-
           <div>
             <label className="font-semibold">
               Subcategory
             </label>
 
-            <input
-              type="text"
+            <select
               name="subcategory"
               value={product.subcategory}
               onChange={handleChange}
               className="w-full border p-3 rounded mt-2"
-            />
+            >
+              <option value="">Select Subcategory</option>
+
+              {subcategories[product.category].map((sub) => (
+                <option key={sub} value={sub}>
+                  {sub}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="col-span-2">
@@ -321,12 +373,12 @@ function AddProduct() {
 
           <div className="col-span-2">
 
-          <button
-  onClick={handleSubmit}
-  className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800"
->
-  Save Product
-</button>
+            <button
+              onClick={handleSubmit}
+              className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800"
+            >
+              Save Product
+            </button>
 
           </div>
 
