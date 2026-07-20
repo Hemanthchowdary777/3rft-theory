@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiX, FiInstagram } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const QuickViewModal = ({ product, isOpen, onClose }) => {
+  const navigate = useNavigate();
+  const [activeImage, setActiveImage] = useState(0);
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -19,6 +22,21 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
   if (!product) return null;
 
   const { name, price, condition, sizes, description, images } = product;
+  const nextImage = () => {
+    if (images.length <= 1) return;
+  
+    setActiveImage((prev) =>
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
+  
+  const prevImage = () => {
+    if (images.length <= 1) return;
+  
+    setActiveImage((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
 
   // WhatsApp prefilled message
   const prefilledMessage = `Hi 3RFT THEORY,\n\nI'm interested in purchasing this product (via Quick View).\n\nProduct Name:\n${name}\n\nPrice:\n₹${price.toLocaleString('en-IN')}\n\nPlease let me know if it is available.`;
@@ -55,13 +73,33 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
             </button>
 
             {/* Left: Product Image */}
-            <div className="md:w-1/2 aspect-[3/4] md:aspect-auto bg-luxury-lightGrey">
-              <img
-                src={images[0]}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <div className="relative md:w-1/2 aspect-[3/4] md:aspect-auto bg-luxury-lightGrey">
+
+  <img
+    src={images[activeImage] || images[0]}
+    alt={name}
+    className="w-full h-full object-contain bg-white"
+  />
+
+  {images.length > 1 && (
+    <>
+      <button
+        onClick={prevImage}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full shadow-lg w-10 h-10 flex items-center justify-center text-xl"
+      >
+        ❮
+      </button>
+
+      <button
+        onClick={nextImage}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full shadow-lg w-10 h-10 flex items-center justify-center text-xl"
+      >
+        ❯
+      </button>
+    </>
+  )}
+
+</div>
 
             {/* Right: Product Details */}
             <div className="md:w-1/2 p-6 sm:p-8 md:p-10 flex flex-col justify-between space-y-6">
@@ -141,11 +179,14 @@ const QuickViewModal = ({ product, isOpen, onClose }) => {
                 </a>
                 
                 <button
-                  onClick={onClose}
-                  className="text-[9px] text-center text-luxury-darkGrey hover:text-luxury-dark uppercase tracking-widest underline pt-1 font-semibold"
-                >
-                  Close & View Details
-                </button>
+  onClick={() => {
+    onClose();
+    navigate(`/product/${product.id}`);
+  }}
+  className="text-[9px] text-center text-luxury-darkGrey hover:text-luxury-dark uppercase tracking-widest underline pt-1 font-semibold"
+>
+  Close & View Details
+</button>
               </div>
             </div>
           </motion.div>

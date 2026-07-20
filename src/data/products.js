@@ -108,6 +108,7 @@ export async function fetchFeaturedProducts(limit = 4) {
 
   return products
     .filter((product) => product.featured)
+    .sort((a, b) => new Date(b.$createdAt) - new Date(a.$createdAt))
     .slice(0, limit)
     .map(transformProduct);
 }

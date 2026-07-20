@@ -3,12 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FiInstagram, FiCornerUpLeft } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
 
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 import ProductCard from '../components/ProductCard';
 import { useProductBySlug } from '../hooks/useProducts';
 import { PLACEHOLDER_IMAGE } from '../lib/imageUrl';
@@ -52,6 +47,21 @@ const ProductDetails = ({ onQuickView }) => {
   }
 
   const { name, price, condition, sizes, description, images, soldOut, newArrival } = product;
+  const nextImage = () => {
+    if (images.length <= 1) return;
+  
+    setActiveImageIndex((prev) =>
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
+  
+  const prevImage = () => {
+    if (images.length <= 1) return;
+  
+    setActiveImageIndex((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
 
   // Construct URL-encoded pre-filled WhatsApp message
   const prefilledMessage = `Hi 3RFT THEORY,\n\nI'm interested in purchasing this product.\n\nProduct Name:\n${name}\n\nPrice:\n₹${price.toLocaleString('en-IN')}\n\nPlease let me know if it is available.`;
@@ -79,28 +89,57 @@ const ProductDetails = ({ onQuickView }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-24">
           {/* Column 1: Image Gallery (Span 7) */}
           <div className="lg:col-span-7 flex flex-col gap-4">
-          <Swiper
-  modules={[Navigation, Pagination]}
-  navigation
-  pagination={{ clickable: true }}
-  loop={images.length > 1}
-  spaceBetween={10}
-  className="aspect-[3/4] rounded-lg overflow-hidden"
->
-  {images.map((img, index) => (
-    <SwiperSlide key={index}>
+
+<div className="relative aspect-[3/4] bg-luxury-lightGrey rounded-lg overflow-hidden">
+
+  <img
+    src={images[activeImageIndex] || PLACEHOLDER_IMAGE}
+    alt={name}
+    className="w-full h-full object-contain bg-white"
+    onError={(event) => {
+      event.currentTarget.src = PLACEHOLDER_IMAGE;
+    }}
+  />
+
+  {images.length > 1 && (
+    <>
+      <button
+        onClick={prevImage}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-lg w-10 h-10 flex items-center justify-center text-xl"
+      >
+        ❮
+      </button>
+
+      <button
+        onClick={nextImage}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-lg w-10 h-10 flex items-center justify-center text-xl"
+      >
+        ❯
+      </button>
+    </>
+  )}
+
+</div>
+
+{images.length > 1 && (
+  <div className="flex gap-2 overflow-x-auto">
+    {images.map((img, index) => (
       <img
-        src={img || PLACEHOLDER_IMAGE}
-        alt={`${name} ${index + 1}`}
-        className="w-full h-full object-cover"
-        onError={(event) => {
-          event.currentTarget.src = PLACEHOLDER_IMAGE;
-        }}
+        key={index}
+        src={img}
+        alt={`Thumbnail ${index + 1}`}
+        onClick={() => setActiveImageIndex(index)}
+        className={`w-20 h-24 object-cover cursor-pointer border-2 ${
+          activeImageIndex === index
+            ? "border-black"
+            : "border-transparent"
+        }`}
       />
-    </SwiperSlide>
-  ))}
-</Swiper>
-          </div>
+    ))}
+  </div>
+)}
+
+</div>
 
           {/* Column 2: Sticky Info Panel (Span 5) */}
           <div className="lg:col-span-5 lg:sticky lg:top-28 self-start flex flex-col space-y-6">
